@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رفع الصور</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h1>رفع الصورة</h1>
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="image">اختر الصورة:</label>
+                <input type="file" id="image" name="image" accept="image/*" required>
+                <div class="preview" id="imagePreview"></div>
+            </div>
+
+
+
+            <button type="submit">رفع الصورة</button>
+        </form>
+
+        <div class="status" id="statusMessage"></div>
+    </div>
+
+    <script>
+        document.getElementById('image').addEventListener('change', function (e) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                }
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData();
+            const imageFile = document.getElementById('image').files[0];
+
+
+            formData.append('image', imageFile);
+
+
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.className = 'status';
+            statusElement.textContent = 'جاري رفع الملف...';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/user/addavatar', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': `Bearer add_token_here`
+
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusElement.className = 'status success';
+                    statusElement.textContent = 'تم رفع الصورة بنجاح!';
+                    console.log('Success:', result);
+                } else {
+                    throw new Error(result.message || 'حدث خطأ أثناء الرفع');
+                }
+            } catch (error) {
+                statusElement.className = 'status error';
+                statusElement.textContent = error.message;
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+ngrok http --region=eu  --url=wise-liger-quickly.ngrok-free.app 3000
+
+https://dashboard.ngrok.com/get-started/setup/windows
+
+
+
+
+
+
+
+
+
+
+how to run server :  
+first start mongodb server 
+then open terminal on project root  and type 'npm start'
+start you VPN
+then open terminal and type  'ngrok http --region=eu  --url=wise-liger-quickly.ngrok-free.app 3000'
+ngrok inspect  :  http://127.0.0.1:4040/inspect/http
+server : https://wise-liger-quickly.ngrok-free.app/
+
+
+
+
+
+
+
