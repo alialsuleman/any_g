@@ -53,6 +53,10 @@ const ExerciseSchema = new Schema<IExercise>({
         enum: ['beginner', 'intermediate', 'advanced'],
         required: true
     },
+    equipment: [{
+        type: String,
+        trim: true
+    }],
     targetMuscles: [{
         type: String,
         trim: true

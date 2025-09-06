@@ -63,6 +63,7 @@ export const exerciseController = {
                     })
                 );
             }
+            console.log(targetMuscles);
 
             const newExercise: IExercise = new Exercise({
                 name,
@@ -73,7 +74,7 @@ export const exerciseController = {
                 reps: parseInt(reps),
                 equipment: equipment ? JSON.parse(equipment) : [],
                 difficulty,
-                targetMuscles: Array.isArray(targetMuscles) ? targetMuscles : [targetMuscles],
+                targetMuscles: targetMuscles ? JSON.parse(targetMuscles) : [],
                 images: imagesUrl,
                 FitnessProgram: programId
             });
