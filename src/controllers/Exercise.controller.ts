@@ -46,23 +46,49 @@ export const exerciseController = {
 
 
             // Process images and upload to Cloudinary
-            const images = Array.isArray(req.files)
-                ? req.files.map((file: Express.Multer.File) => file)
+            const files = Array.isArray(req.files)
+                ? req.files
                 : [];
 
             let imagesUrl: string[] = [];
+            let videosUrl: string[] = [];
 
-            if (images.length > 0) {
-                imagesUrl = await Promise.all(
-                    images.map(async (item) => {
-                        const result = await cloudinary.uploader.upload(item.path, {
-                            resource_type: 'image',
-                            folder: 'fitness_app/exercises'
-                        });
-                        return result.secure_url;
-                    })
-                );
+            if (files.length > 0) {
+                // معالجة الصور
+                const imageFiles = files.filter(file => file.mimetype.startsWith('image/'));
+                if (imageFiles.length > 0) {
+                    const imageUrls = await Promise.all(
+                        imageFiles.map(async (item) => {
+                            const result = await cloudinary.uploader.upload(item.path, {
+                                resource_type: 'image',
+                                folder: 'fitness_app/exercises/images'
+                            });
+                            return result.secure_url;
+                        })
+                    );
+                    imagesUrl = imageUrls;
+                }
+
+                // معالجة الفيديوهات
+                const videoFiles = files.filter(file => file.mimetype.startsWith('video/'));
+                if (videoFiles.length > 0) {
+                    const videoUrls = await Promise.all(
+                        videoFiles.map(async (item) => {
+                            const result = await cloudinary.uploader.upload(item.path, {
+                                resource_type: 'video',
+                                folder: 'fitness_app/exercises/videos'
+                            });
+                            return result.secure_url;
+                        })
+                    );
+                    videosUrl = videoUrls;
+                }
             }
+            console.log(videosUrl);
+            console.log(imagesUrl);
+
+
+            // الآن يمكنك استخدام imagesUrl للصور و videosUrl للفيديوهات
             console.log(targetMuscles);
 
             const newExercise: IExercise = new Exercise({
@@ -75,7 +101,7 @@ export const exerciseController = {
                 equipment: equipment ? JSON.parse(equipment) : [],
                 difficulty,
                 targetMuscles: targetMuscles ? JSON.parse(targetMuscles) : [],
-                images: imagesUrl,
+                images: [...imagesUrl, ...videosUrl],
                 FitnessProgram: programId
             });
 

@@ -20,19 +20,22 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 5 * 1024 * 1024
+        fileSize: 50 * 1024 * 1024
     },
     fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) {
+        const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        const allowedVideoTypes = ['video/mp4', 'video/mpeg', 'video/quicktime'];
+
+        if (allowedImageTypes.includes(file.mimetype) || allowedVideoTypes.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error('only photos allowed'));
+            cb(new Error('Only JPEG, PNG, GIF images and MP4, MPEG, MOV videos are allowed'));
         }
     }
 });
 
 // Routes
-router.post('/', verify, verfiyCoach, upload.array('images', 5), exerciseController.createExercise); // tested
+router.post('/', verify, verfiyCoach, upload.array('images', 6), exerciseController.createExercise); // tested
 router.get('/:id', exerciseController.getExerciseById); // tested
 router.put('/:id', verify, verfiyCoach, exerciseController.updateExercise); // tested
 router.delete('/:id', verify, verfiyCoach, exerciseController.deleteExercise); // tested
